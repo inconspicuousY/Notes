@@ -1,3 +1,6 @@
+## VSCode配置
+
+```json
 {
   // **************** 基础设置 ********************
   "workbench.colorTheme": "Material Theme Palenight",
@@ -153,3 +156,5 @@
   "leetcode.endpoint": "leetcode-cn",
   "leetcode.hint.configWebviewMarkdown": false
 }
+```
+
