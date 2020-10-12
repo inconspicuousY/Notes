@@ -32,6 +32,28 @@
 
 ### 2.2 方式二：直接继承jakarta包下的HttpServlet
 
+#### 2.2.1 引入相关的依赖包
+
+- 非maven普通项目
+
+直接将tomcat10添加到项目依赖中即可。
+
+- maven项目引入如下依赖
+
+```xml
+        <!-- https://mvnrepository.com/artifact/jakarta.servlet/jakarta.servlet-api -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>5.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+```
+
+这里引入的就是Jakarta包下面的servlet相关的jar包，而不再是javax包下面的。
+
+#### 2.2.2 Servlet示例
+
 ```java
 package com.inconspicuousy.servlet;
 
@@ -55,6 +77,6 @@ public class HelloServlet extends HttpServlet {
 
 这种方式适合项目初期可以更改代码，改动量不大的情况采用。
 
-> 注意：采用该方式的话，我们直接将tomcat的相关Jar包引入到依赖中即可， 不需要再像以前一样引入javax.servlet-api相关的Jar包或者依赖了。
+> 注意：采用该方式的话，我们直接引入jakarta相关的Jar包即可， 不需要再像以前一样引入javax.servlet-api相关的Jar包或者依赖了。
 
 ### 
