@@ -12,6 +12,8 @@ tomcat控制台日志输出配置文件为tomcat安装位置下`conf/logging.pro
 java.util.logging.ConsoleHandler.encoding = GBK
 ```
 
+> 注意：因为win系统默认采用的编码方式为GBK，如果直接采用 `startup.bat` 的方式启动的话，直接将对应的编码方式改为GBK即可。
+
 ## 2. Idea控制台编码方式设置
 
 因为Idea本身是由Java语言编写的客户端，其控制台输出编码方式是由自身的Java虚拟机控制的，所以我们只需要更改Idea客户端对应的虚拟机的编码方式即可，设置方式如下。
