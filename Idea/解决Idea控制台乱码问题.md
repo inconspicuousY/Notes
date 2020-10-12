@@ -23,3 +23,4 @@ java.util.logging.ConsoleHandler.encoding = GBK
 -Dfile.encoding=utf-8
 ```
 
+> 注意：修改完idea的虚拟机配置之后，需要重新启动Idea，配置文件才会生效，随着Idea的重新启动，Idea的虚拟机会重新加载配置文件。
