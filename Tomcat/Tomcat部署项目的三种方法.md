@@ -48,6 +48,8 @@
 <Context path="/servlet-xml" docBase="D:\web\servlet-xml-1.0-SNAPSHOT" />
 ```
 
+- 启动tomcat。
+
 #### 2.2.2 结果展示
 
 打开浏览器输入 `localhost:8080/path指定的项目名称`即可访问到项目。
@@ -65,6 +67,8 @@
 - 在 `conf/catalina/localhost`目录下创建 `项目名.xml`的配置文件。
 
 ![image-20201013112106127](https://raw.githubusercontent.com/inconspicuousy-start/image/master/image-20201013112106127.png)
+
+- 启动tomcat。
 
 #### 2.3.2 结果展示
 
