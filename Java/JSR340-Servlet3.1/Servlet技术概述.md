@@ -1,10 +1,9 @@
-# Servlet概述
+# Servlet技术概述
 
 ## 1. 什么是 Servlet
 
-> Servlet是基于Java技术实现的Web组件。
+> Servlet是基于Java技术实现的Web组件，是在Web服务器上运行的小型的Java程序，Servlet通常通过HTTP接收和响应来自Web客户端的请求，可以被基于Java技术实现的Web服务器动态加载并运行。
 >
-> 通俗来讲，Servlet是由Java语言编写的一个Jar包，可以被基于Java技术实现的Web服务器动态加载并运行。
 
 ### 1.1 基于 Java 实现的 Web 服务器列表
 
@@ -32,6 +31,18 @@ maven工程的话需要引入如下的依赖
 ```
 
 因为用到Servlet的Maven项目都是JavaEE项目， 最后项目都会被加载到Web服务器中运行，一般Web服务器会自动提供相应的Jar包，所以依赖的生命周期为provided。
+
+> 注意：如果使用Tomcat10的话，由于Tomcat10将Servlet相关的类迁移至jakarta包下，所以引入的Jar文件不再是javax.servlet-api，而是jakarta.servlet-api，相关的maven依赖如下：
+>
+> ```xml
+> <!-- https://mvnrepository.com/artifact/jakarta.servlet/jakarta.servlet-api -->
+> <dependency>
+>     <groupId>jakarta.servlet</groupId>
+>     <artifactId>jakarta.servlet-api</artifactId>
+>     <version>5.0.0</version>
+>     <scope>provided</scope>
+> </dependency>
+> ```
 
 ## 2. 什么是Servlet容器
 
