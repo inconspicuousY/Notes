@@ -78,5 +78,3 @@ public class HelloServlet extends HttpServlet {
 这种方式适合项目初期可以更改代码，改动量不大的情况采用。
 
 > 注意：采用该方式的话，我们直接引入jakarta相关的Jar包即可， 不需要再像以前一样引入javax.servlet-api相关的Jar包或者依赖了。
-
-### 
