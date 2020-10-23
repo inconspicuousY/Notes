@@ -215,3 +215,111 @@ protected void service(HttpServletRequest req, HttpServletResponse resp)
 > 3、此方法使Servlet有机会清理所持有的任何资源（例如，内存，文件句柄，线程），并确保任何持久状态都与Servlet在内存中的当前状态同步。
 
 在我们平时使用过程中，常常都是关闭Web服务器时就会触发Servlet的destory方法，我们可以在destory中作一些关闭资源的操作，比如我们在Servlet的init方法中初始化了线程池，就可以在destory中关闭这个线程池。
+
+## 4. Servlet的生命周期
+
+### 4.1 图解生命周期
+
+![image-20201023174212215](https://raw.githubusercontent.com/inconspicuousy-start/image/master/image-20201023174212215.png)
+
+> 注意：
+>
+> 1、对于第三步和第四步，Servlet只会被创建一次并执行一次init方法，Servlet容器如果检查到内存中已经存在Servlet对象说明Servlet对象已经执行完init方法了，那么就会直接调用service方法处理请求。
+>
+> 2、Servlet不是在Web服务器启动的时候全部加载到内存中的， 是在Servlet容器解析请求时，根据请求路径解析到对应的Servlet，然后再去加载Servlet。
+
+我们大致可以将Servlet的生命周期分为三个阶段：
+
+- 初始化阶段
+
+> Servlet容器解析请求找到处理请求的Servlet，一旦Servlet还没有被创建，那么此时就会触发初始化阶段。初始化阶段分为两步：
+>
+> 1、创建Servlet实例。
+>
+> 2、执行Servlet的初始化方法。
+>
+> 注意，初始化步骤只会执行一次，一旦被执行就不会再执行。
+
+- 运行阶段
+
+> Servlet容器解析请求找到处理请求的Servlet，一旦Servlet还没有已经被创建，那么就会直接调用Servlet的service方法处理请求，运行阶段只会涉及到service方法。
+>
+> 值得注意的是，每一次请求service必会被执行。
+
+- 销毁阶段
+
+> 当服务器关闭或者Web应用被移除容器时，Servlet会随着Web应用的关闭而销毁。在销毁Servlet之前，Servlet容器会调用Sevlet的destroy方法。
+>
+> 值得注意的是，destory方法只会在Servlet销毁时执行一次。
+
+### 4.2 代码演示
+
+1、自定义Servlet，并重写相关方法。
+
+```java
+package com.inconspicuousy.servlet;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+/**
+ * @author peng.yi
+ */
+public class LifecycleServlet extends HttpServlet {
+
+    public LifecycleServlet() {
+        System.out.println("我是Servlet构造器");
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        System.out.print("每次请求的Servlet对象 => ");
+        System.out.println(this);
+        System.out.println("执行Service方法转发的doGet方法");
+    }
+
+    @Override
+    public void destroy() {
+        System.out.println("我是Servlet销毁的方法");
+    }
+
+    @Override
+    public void init() throws ServletException {
+        System.out.println("我是Servlet的初始化方法");
+    }
+}
+
+```
+
+2、配置好web.xml以及tomcat之后，启动tomcat，发现控制台并没有打印执行Servlet构造器方法的相关文字，说明Web服务器启动之后，Servlet容器并没有直接就创建Servlet对象。
+
+3、进行第一次Get请求打印信息如下：
+
+```
+我是Servlet构造器
+我是Servlet的初始化方法
+每次请求的Servlet对象 => com.inconspicuousy.servlet.LifecycleServlet@249c2b2b
+执行Service方法转发的doGet方法
+```
+
+说明第一次请求时，Servlet容器解析路径并没有发现Servlet对象，就会执行初始化阶段，创建Sevlet对象并执行初始化方式，待初始化阶段完成之后，执行运行阶段，执行service方法对请求做处理。
+
+4、进行第二次Get请求打印信息如下：
+
+```
+每次请求的Servlet对象 => com.inconspicuousy.servlet.LifecycleServlet@249c2b2b
+执行Service方法转发的doGet方法
+```
+
+说明在Servlet运行阶段，不会再执行初始化阶段了，并且每次处理请求的servlet都是同一个对象，说明对于web程序来说Servlet可以说是单例的，这里只执行了service方法。
+
+5、关闭服务器之后打印信息如下：
+
+```
+我是Servlet销毁的方法
+```
+
+随着服务器的关闭，Servlet容器调用Servlet的销毁方法，关闭Servlet，Servlet生命周期结束。

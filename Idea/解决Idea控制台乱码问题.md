@@ -26,3 +26,15 @@ java.util.logging.ConsoleHandler.encoding = GBK
 ```
 
 > 注意：修改完idea的虚拟机配置之后，需要重新启动Idea，配置文件才会生效，随着Idea的重新启动，Idea的虚拟机会重新加载配置文件。
+
+## 3. Web程序的默认编码方式设置
+
+有的Web程序的默认编码方式为GBK，此时我们需要在项目启动的时候添加虚拟机参数 `-Dfile.encoding=utf-8`控制项目的编码方式。
+
+比如，我们用Tomcat启动项目时，Idea做如下的配置即可：
+
+![image-20201023182345210](https://raw.githubusercontent.com/inconspicuousy-start/image/master/image-20201023182345210.png)
+
+> 一般我们如何确定项目的默认的编码方式呢？
+>
+> 在我们代码中利用 `Charset.defaultCharset()`方法即可获取到项目的编码方式，我们在项目中打印出来即可。
