@@ -264,7 +264,17 @@ serverName = 172.16.2.148
 serverPort = 8080
 ```
 
-#### 2.2.2 其他请求头获取方法
+#### 2.2.2 Session + Cookie
+
+| 方法名     | 方法签名                                      | 方法描述                                                     |
+| ---------- | --------------------------------------------- | ------------------------------------------------------------ |
+| getCookies | public Cookie[] getCookies()                  | 以Cookie数组的形式返回请求头中Cookie信息。如果请求头没有Cookie的信息则返回null。 |
+| getSession | public HttpSession getSession(boolean create) | 返回与此请求关联的当前的HttpSession对象。如果没有当前会话且create为true；则返回一个新会话。如果create为false且请求没有有效的HttpSession，则此方法返回null。如果容器使用cookie来维护会话的完整性，并且提交响应时被要求创建新的会话，则抛出IllgalStateException异常。 |
+| getSession | public HttpSession getSession()               | 返回与此请求相关联的当前的HttpSession对象，如果请求没有一个当前会话对象则创建一个。 |
+
+
+
+#### 2.2.3 其他请求头获取方法
 
 > 注意：请求头名称都不区分大小写。
 
@@ -273,9 +283,9 @@ serverPort = 8080
 | getHeader            | public String getHeader(String name)                     | 返回指定请求头对应的请求头值。如果该请求头不存在，则返回null；如果有多个同名的请求头，则返回请求头中第一次出现的请求头对应的值。请求头名称不区分大小写。 |
 | getHeaders           | public Enumeration&lt;String&gt; getHeaders(String name) | 以枚举的方法返回指定请求头对应的所有的请求头值。如果请求不包含该请求头，则返回一个空的枚举类；如果Servlet容器没有权限访问到该请求头信息，那么直接返回null。 |
 | getHeaderNames       | public Enumeration&lt;String&gt;getHeaderNames()         | 返回一个包含所有请求头名称的枚举类。如果请求没有请求头部信息则返回一个空的枚举类；如果Servlet容器没有权限访问到该方法，则返回null。 |
-| getIntHeader         | public int getIntHeader(String name)                     | 以整数的形式返回指定请求头对应的请求头值。如果请求头不存在，则返回-1，如果请求头值不能转化成整数则抛出NumberFormatException异常。 |
-| getDateHeader        | public long getDateHeader(String name)                   |                                                              |
-| getContentType       |                                                          |                                                              |
-| getContentLength     |                                                          |                                                              |
-| getCharacterEncoding |                                                          |                                                              |
+| getIntHeader         | public int getIntHeader(String name)                     | 以整数的形式返回指定请求头对应的请求头值。如果请求头不存在，则返回-1；如果请求头值不能转化成整数则抛出NumberFormatException异常。 |
+| getDateHeader        | public long getDateHeader(String name)                   | 以Date形式返回指定头对应的请求头值，最后会将Date的值转化成对应的时间戳。如果请求头不存在返回-1；如果请求头值不能转化成Date形式则抛出IllegalArgumentException异常。 |
+| getContentType       | public String getContentType()                           | 返回请求体的MIME类型。如果类型未知未知则返回null。           |
+| getContentLength     | public int getContentLength()                            | 以字节为单位，返回请求主体的长度，该长度可由输入流提供。如果长度未知或者大于Integer.MAX_VALUE的值则返回-1。 |
+| getCharacterEncoding | public String getCharacterEncoding()                     | 返回请求体的编码方式。如果没有指定请求编码方式则返回null。设置请求编码方式的优先级（从高到低）：每个请求 &gt; 每个Web应用程序（通过ServletContext.setRequestCharacterEncoding设置）&gt; 每个容器（对于该容器中部署的所有的Web应用程序）。 |
 
