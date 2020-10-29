@@ -323,3 +323,14 @@ public class LifecycleServlet extends HttpServlet {
 ```
 
 随着服务器的关闭，Servlet容器调用Servlet的销毁方法，关闭Servlet，Servlet生命周期结束。
+
+## 5. Servlet处理用户请求的完整流程
+
+### 5.1 图解Servlet处理用户请求流程
+
+![image-20201027224517367](https://raw.githubusercontent.com/inconspicuousy-start/image/master/image-20201027224517367.png)
+
+ 在Servlet的每次请求， Web服务器在调用service（）方法之前，都会创建ServletRequest和ServletResponse对象。其中ServletRequest对象用于封装HTTP请求信息，简称request对象。ServletResponse对象用于封装HTTP响应信息，简称response对象。
+
+> 注：在Web服务器运行阶段，每个Servlet都只会创建一个实例对象，针对每次HTTP请求，Web服务器都会调用Servlet实例的service方法，每次调用都会重新创建request和response对象。
+
