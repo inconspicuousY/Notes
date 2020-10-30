@@ -266,13 +266,111 @@ serverPort = 8080
 
 #### 2.2.2 Session + Cookie
 
+> 默认服务器生成的Session信息是由Cookie来维护的，当生成Session对象时，服务器会设置一个名称固定为JSESSIONID，值为Session唯一的识别码的Cookie作为响应头返回给客户端，客户端会将该Cookie信息保存下来，默认该Cookie的作用域对象为Session，即当前浏览器会话，当浏览器会话关闭时，该Cookie自动失效。
+>
+> 服务端拿到客户端请求的Cookie信息，发现存在JSESSIONID的Cookie时，拿到Session对应的唯一识别码从内存中查找到对应的Session对象，就可以获取到该Session设置的相关属性，比如保存在的某些属性和属性值。
+
 | 方法名     | 方法签名                                      | 方法描述                                                     |
 | ---------- | --------------------------------------------- | ------------------------------------------------------------ |
 | getCookies | public Cookie[] getCookies()                  | 以Cookie数组的形式返回请求头中Cookie信息。如果请求头没有Cookie的信息则返回null。 |
 | getSession | public HttpSession getSession(boolean create) | 返回与此请求关联的当前的HttpSession对象。如果没有当前会话且create为true；则返回一个新会话。如果create为false且请求没有有效的HttpSession，则此方法返回null。如果容器使用cookie来维护会话的完整性，并且提交响应时被要求创建新的会话，则抛出IllgalStateException异常。 |
 | getSession | public HttpSession getSession()               | 返回与此请求相关联的当前的HttpSession对象，如果请求没有一个当前会话对象则创建一个。 |
 
+这里我们再次模拟GET请求来验证Session和Cookie的信息。
 
+- Servlet代码
+
+```java
+package com.inconspicuousy.servlet;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.Objects;
+
+/**
+ * @author peng.yi
+ */
+@WebServlet(value = "/cookie-session-servlet")
+public class CookieSessionServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        System.out.println("==========开始处理Session和Cookie==========");
+        // 从请求头Cookie中获取到所有的Cookie对象，如果不存在Cookie头不存在则返回null
+        Cookie[] cookies = req.getCookies();
+        System.out.println("cookies = " + Arrays.toString(cookies));
+        if (Objects.nonNull(cookies)) {
+            Arrays.stream(cookies).forEach(cookie -> {
+                String name = cookie.getName();
+                System.out.println("name = " + name);
+                String value = cookie.getValue();
+                System.out.println("value = " + value);
+                // 获取到Cookie的最大生存时间，默认是当浏览器关闭Cookie销毁时返回-1
+                int maxAge = cookie.getMaxAge();
+                System.out.println("maxAge = " + maxAge);
+            });
+        }
+
+        // 获取到当前的Session对象， 如果不存在创建Session对象
+        // 创建的Session对象会随着响应信息作为Cookie返回给客户端
+        HttpSession session = req.getSession();
+        System.out.println("session = " + session);
+        // Session对象以键值对的形式维护了多个属性和属性值。
+        Enumeration<String> attributeNames = session.getAttributeNames();
+        while (attributeNames.hasMoreElements()) {
+            String sessionName = attributeNames.nextElement();
+            System.out.println("sessionName = " + sessionName);
+            Object sessionValue = session.getAttribute(sessionName);
+            System.out.println("sessionValue = " + sessionValue);
+        }
+        // 设置一组Session的属性和属性值
+        session.setAttribute("SESSION_ID", "SESSION_VALUE");
+
+    }
+}
+```
+
+- 清除浏览器中 `http://172.16.2.148:8080` 的Cookie信息。
+- 请求路径
+
+```http
+http://localhost:8080/servlet_annotation/cookie-session-servlet
+```
+
+- 第一次请求控制台打印信息
+
+```shell
+cookies = null
+session = org.apache.catalina.session.StandardSessionFacade@249c2b2b
+```
+
+- 查看HTTP响应的Cookie信息
+
+```http
+Set-Cookie: JSESSIONID=50B8BE77E4F71891B187743987283289; Path=/servlet_annotation; HttpOnly
+```
+
+Cookie的值默认是JESSIONID，Cookie的值为当前Session对象的唯一识别码，客户端会将该Cookie保存起来，再次请求时会将该Cookie信息在请求头中传递给服务器。
+
+- 第二次请求控制台打印信息
+
+```shell
+==========开始处理Session和Cookie==========
+cookies = [javax.servlet.http.Cookie@1438fea2]
+name = JSESSIONID
+value = 50B8BE77E4F71891B187743987283289
+maxAge = -1
+session = org.apache.catalina.session.StandardSessionFacade@249c2b2b
+sessionName = SESSION_ID
+sessionValue = SESSION_VALUE
+```
+
+从打印信息来看就验证了Session和Cookie的相关关系。
 
 #### 2.2.3 其他请求头获取方法
 
