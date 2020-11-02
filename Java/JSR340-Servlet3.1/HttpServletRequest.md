@@ -270,11 +270,12 @@ serverPort = 8080
 >
 > 服务端拿到客户端请求的Cookie信息，发现存在JSESSIONID的Cookie时，拿到Session对应的唯一识别码从内存中查找到对应的Session对象，就可以获取到该Session设置的相关属性，比如保存在的某些属性和属性值。
 
-| 方法名     | 方法签名                                      | 方法描述                                                     |
-| ---------- | --------------------------------------------- | ------------------------------------------------------------ |
-| getCookies | public Cookie[] getCookies()                  | 以Cookie数组的形式返回请求头中Cookie信息。如果请求头没有Cookie的信息则返回null。 |
-| getSession | public HttpSession getSession(boolean create) | 返回与此请求关联的当前的HttpSession对象。如果没有当前会话且create为true；则返回一个新会话。如果create为false且请求没有有效的HttpSession，则此方法返回null。如果容器使用cookie来维护会话的完整性，并且提交响应时被要求创建新的会话，则抛出IllgalStateException异常。 |
-| getSession | public HttpSession getSession()               | 返回与此请求相关联的当前的HttpSession对象，如果请求没有一个当前会话对象则创建一个。 |
+| 方法名                | 方法签名                                      | 方法描述                                                     |
+| --------------------- | --------------------------------------------- | ------------------------------------------------------------ |
+| getCookies            | public Cookie[] getCookies()                  | 以Cookie数组的形式返回请求头中Cookie信息。如果请求头没有Cookie的信息则返回null。 |
+| getSession            | public HttpSession getSession(boolean create) | 返回与此请求关联的当前的HttpSession对象。如果没有当前会话且create为true；则返回一个新会话。如果create为false且请求没有有效的HttpSession，则此方法返回null。如果容器使用cookie来维护会话的完整性，并且提交响应时被要求创建新的会话，则抛出IllgalStateException异常。 |
+| getSession            | public HttpSession getSession()               | 返回与此请求相关联的当前的HttpSession对象，如果请求没有一个当前会话对象则创建一个。 |
+| getRequestedSessionId | public String getRequestedSessionId()         | 返回Session的唯一识别码。如果没有SessionId，直接返回null。   |
 
 这里我们再次模拟GET请求来验证Session和Cookie的信息。
 
@@ -330,6 +331,10 @@ public class CookieSessionServlet extends HttpServlet {
         }
         // 设置一组Session的属性和属性值
         session.setAttribute("SESSION_ID", "SESSION_VALUE");
+        
+         // 获取到Session的唯一识别码
+        String requestedSessionId = req.getRequestedSessionId();
+        System.out.println("requestedSessionId = " + requestedSessionId);
 
     }
 }
@@ -346,7 +351,8 @@ http://localhost:8080/servlet_annotation/cookie-session-servlet
 
 ```shell
 cookies = null
-session = org.apache.catalina.session.StandardSessionFacade@249c2b2b
+session = org.apache.catalina.session.StandardSessionFacade@1ec3de03
+requestedSessionId = null
 ```
 
 - 查看HTTP响应的Cookie信息
@@ -361,18 +367,34 @@ Cookie的值默认是JESSIONID，Cookie的值为当前Session对象的唯一识�
 
 ```shell
 ==========开始处理Session和Cookie==========
-cookies = [javax.servlet.http.Cookie@1438fea2]
+cookies = [javax.servlet.http.Cookie@249c2b2b]
 name = JSESSIONID
-value = 50B8BE77E4F71891B187743987283289
+value = 7B3CD55C67576B074A5E1027458050AD
 maxAge = -1
-session = org.apache.catalina.session.StandardSessionFacade@249c2b2b
+session = org.apache.catalina.session.StandardSessionFacade@1ec3de03
 sessionName = SESSION_ID
 sessionValue = SESSION_VALUE
+requestedSessionId = 7B3CD55C67576B074A5E1027458050AD
+
 ```
 
 从打印信息来看就验证了Session和Cookie的相关关系。
 
-#### 2.2.3 其他请求头获取方法
+#### 2.2.3 认证相关
+
+| 方法名           | 方法签名                                                  | 方法描述                                                     |
+| ---------------- | --------------------------------------------------------- | ------------------------------------------------------------ |
+| getAuthType      | public String getAuthType()                               | 返回用于保护Servlet的身份验证方案的名称。所有的Servlet容器都支持BASIC_AUTH（基础认证）、FORM_AUTH（表单认证）、CLIENT_CERT_AUTH（客户端身份认证），并可能还支持DIGEST_AUTHENTICATION（摘要认证）。如果servlet未经过身份验证则返回null。 |
+| isUserInRole     | public boolean isUserInRole(String role)                  | 返回一个Boolean，指明经过身份验证的用户是否包含指定的逻辑角色中。可以使用部署描述符（web.xml）定义角色和角色成员身份。如果用户尚未经过身份验证，则该方法将返回false。 |
+| getUserPrincipal | public java.security.Principal getUserPrincipal()         | 返回一个Principal对象，其中包含当前经过身份验证的用户的名称。如果用户尚未通过身份验证，则该方法返回null。 |
+| authenticate     | public boolean authenticate(HttpServletResponse response) | 使用为ServletContext配置的容器登录机制来验证发出此请求的用户。如果getUserPrincipal、getRemoteUser和getAuthType都是非空的话则返回true。如果身份验证不完整并且底层登录机制已在响应中提交了要返回给用户的消息和HTTP状态代码，则返回false。此方法可以修改此请求的响应参数。 |
+| getRemoteUser    | public String getRemoteUser()                             | 如果用户已通过身份验证，则返回发出此请求的用户的登录名；如果用户未通过身份验证，如果用户未通过身份验证，则返回null。用户名是否随每个后续请求一起发送，取决于浏览器和身份验证类型。 |
+| login            | public void login(String username, String password)       | 在为ServletContext配置的Web容器登录机制所使用的密码验证领域中，验证提供的用户名和密码。如果配置的登录机制不支持用户名密码身份验证，或者在登录之前已经建立了非空调用者身份，或者对提供的用户名和密码的验证失败时抛出ServletExption。当此方法返回而没有引发异常时，他必须已建立非控制，作为getUserPrincipal、getRemoteUser、getAuthType返回的值。 |
+| logout           | public void logout()                                      | 退出登录 ，调用getUserPrincipal、getRemoteUser、getAuthType时返回null。 |
+
+
+
+#### 2.2.4 其他请求头获取方法
 
 > 注意：请求头名称都不区分大小写。
 
@@ -386,4 +408,6 @@ sessionValue = SESSION_VALUE
 | getContentType       | public String getContentType()                           | 返回请求体的MIME类型。如果类型未知未知则返回null。           |
 | getContentLength     | public int getContentLength()                            | 以字节为单位，返回请求主体的长度，该长度可由输入流提供。如果长度未知或者大于Integer.MAX_VALUE的值则返回-1。 |
 | getCharacterEncoding | public String getCharacterEncoding()                     | 返回请求体的编码方式。如果没有指定请求编码方式则返回null。设置请求编码方式的优先级（从高到低）：每个请求 &gt; 每个Web应用程序（通过ServletContext.setRequestCharacterEncoding设置）&gt; 每个容器（对于该容器中部署的所有的Web应用程序）。 |
+| getParts             | public Collection&lt;Part&gt; getParts()                 |                                                              |
+| getPart              | public Part getPart(String name)                         |                                                              |
 
