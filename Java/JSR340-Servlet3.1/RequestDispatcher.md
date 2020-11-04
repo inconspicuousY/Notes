@@ -14,7 +14,7 @@
 
 ### 1.1 请求转发工作原理
 
-![image-20201103230629660](https://raw.githubusercontent.com/inconspicuousy-start/image/master/image-20201103230629660.png)
+![image-20201104105731395](https://raw.githubusercontent.com/inconspicuousy-start/image/master/image-20201104105731395.png)
 
 ## 2. 获取RequestDispatcher的三种方式
 
