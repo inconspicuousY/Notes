@@ -2,7 +2,7 @@
 
 ## 1. 简介
 
-> 见名自其义，RequestDispatcher实现的是请求转发。
+> 见名知其义，RequestDispatcher实现的是请求转发。
 >
 > 请求转发的意思就是说通知其他web资源处理当前Servlet的请求。
 >
