@@ -236,3 +236,153 @@ int main(void) {
 const 数据类型 常量名 = 常量值;
 ```
 
+### 4.4 明示常量
+
+什么是明示常量？明示常量指的是C语言中通过头文件内置的一些预处理器声明的常量，通过引入这些头文件，就可以在程序中直接使用这些常量。
+
+常用的内含明示常量的头文件有 `limits.h`、`float.h`等。我们可以直接打开对应的头文件进行查看。
+
+- limits.h
+
+limits.h头文件中主要提供了与整数类型大小限制相关的详细信息。
+
+下面列表部分明示常量
+
+| 明示常量   | 含义                           |
+| ---------- | ------------------------------ |
+| CHAR_BIT   | char类型的位数                 |
+| CHAR_MAX   | char类型的最大值               |
+| CHAR_MIN   | char类型的最小值               |
+| SCHAR_MAX  | signed char类型的最大值        |
+| SCHAR_MIN  | signed char类型的最小值        |
+| UCHAR_MAX  | unsigned char类型的最大值      |
+| SHRT_MAX   | short类型的最大值              |
+| INT_MAX    | int类型的最大值                |
+| UINT_MAX   | unsigned int 类型的最大值      |
+| LONG_MAX   | long 类型的最大值              |
+| ULONG_MAX  | unsigned long类型的最大值      |
+| LLONG_MAX  | long long类型的最大值          |
+| ULLONG_MAX | unsigned long long类型的最大值 |
+
+代码示例
+
+```c
+#include <stdio.h>
+// 定义了关于整数类型大小限制的明示常量
+#include <limits.h>
+
+/**
+ * 测试limits.h头文件
+ * @return
+ */
+int main(void) {
+
+    // 获取到char类型的位数
+    int a = CHAR_BIT;
+    printf("char类型的位数 = %d \n", a);
+
+    int b = INT_MAX;
+    printf("int类型的最大值 = %d \n", b);
+
+    int c = INT_MIN;
+    printf("int类型的最小值 = %d \n", c);
+
+    return 0;
+};
+```
+
+输出结果
+
+```
+char类型的位数 = 8 
+int类型的最大值 = 2147483647 
+int类型的最小值 = -2147483648 
+```
+
+- float.h
+
+float.h头文件中主要提供了浮点类型大小限制的相关信息。
+
+下面列举部分明示常量
+
+| 明示常量       | 含义                                              |
+| -------------- | ------------------------------------------------- |
+| FLT_MANT_DIG   | float类型的尾数位数                               |
+| FLT_DIG        | float类型的最少有效数字位数（十进制）             |
+| FLT_MIN_10_EXP | 带全部有效数字的float类型的最小负指数（以10为底） |
+| FLT_MAX_10_EXP | 带全部有效数字的float类型的最大正指数（以10为底） |
+| FLT_MIN        | 保留全部精度的float类型最小正数                   |
+| FLT_MAX        | 保留全部精度float类型的最大正数                   |
+
+代码示例
+
+```c
+#include <stdio.h>
+#include <float.h>
+
+/**
+ * 测试float.h头文件
+ * @return
+ */
+int main(void) {
+
+    printf("float类型的尾数位数 = %d \n", FLT_MANT_DIG);
+    printf("float类型的最少有效数字位数 = %d \n", FLT_DIG);
+    printf("float类型的最小负指数 = %d \n", FLT_MIN_10_EXP);
+    printf("float类型的最大正整数 = %d \n", FLT_MAX_10_EXP);
+    printf("float类型的最小正数 = %f \n", FLT_MIN);
+    printf("float类型的最大正数 = %f \n", FLT_MAX);
+    printf("1.00和比1.00大的最小float类型之间的差值 = %f \n", FLT_EPSILON);
+
+
+    return 0;
+};
+```
+
+输出结果
+
+```
+float类型的尾数位数 = 24 
+float类型的最少有效数字位数 = 6 
+float类型的最小负指数 = -37 
+float类型的最大正整数 = 38 
+float类型的最小正数 = 0.000000 
+float类型的最大正数 = 340282346638528859811704183484516925440.000000 
+1.00和比1.00大的最小float类型之间的差值 = 0.000000 
+```
+
+## 5. 格式化输入和输出
+
+C语言中的格式化输入和输出是通过输入、输出函数实现的，输入输出函数也叫做I/O函数。
+
+C语言中最典型的输入输出函数就是scanf函数和printf函数。
+
+### 5.1 printf函数
+
+printf是C语言中的格式化输出函数。
+
+printf函数有一个典型的特点，它要求打印的数据的指令要与待打印数据的类型相匹配。比如，打印整数时使用%d，打印字符时使用%c。这些符号被称为`转换说明`。
+
+转换说明的作用是什么？它们指定了如何把数据转换成可显示的形式。
+
+常见的转换说明：
+
+| 转换说明 | 输出                                                         |
+| -------- | ------------------------------------------------------------ |
+| %a、%A   | 浮点数、十六进制数和p记数法                                  |
+| %e、%E   | 浮点数、e记数法                                              |
+| %f       | 浮点数、十进制记数法                                         |
+| %g、%G   | 根据值不同，自动选择%f或%e。%e格式用于指数小于-4或者大于或等于精度时。 |
+| %c       | 单个字符                                                     |
+| %d、%i   | 有符号十进制整数                                             |
+| %u       | 无符号十进制整数                                             |
+| %o       | 无符号八进制整数                                             |
+| %x、%X   | 无符号十六进制整数                                           |
+| %p       | 指针                                                         |
+| %s       | 字符串                                                       |
+| %%       | 打印一个百分号                                               |
+
+
+
+
+
